@@ -52,9 +52,8 @@ async function list(req:Request, res:Response )
             message:"page is required"
         })
     }
-
     
-    const apiRes = await api.get(`chapter/list/${courseId}?page=${page}`)
+    const apiRes = await api.get(`chapter/listByCourseId/${courseId}?page=${page}`)
 
     return res.json(apiRes.data)
 
@@ -120,28 +119,26 @@ async function put(req:Request, res:Response )
     try{    
 
     const {
-        title,
-        courseId
+        title
       } = req.body
     const id = req.params.id
 
     if (id == "")
     {
         return res.status(400).json({
-            message:"course id is required"
+            message:"id is required"
         })
     }
 
-    if (title == "" || courseId == "")
+    if (title == "" )
     {
         return res.status(400).json({
             message:appErrorMessages.parametersError
         })
     }
 
-    const apiRes = await api.put(`chapter`,{
-        title,
-        courseId
+    const apiRes = await api.put(`chapter/${id}`,{
+        title
         })
 
     return res.json(apiRes.data)

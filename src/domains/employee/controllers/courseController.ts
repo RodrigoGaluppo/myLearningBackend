@@ -2,7 +2,6 @@ import { Request,Response } from "express";
 import path from "path"
 import api from "../../../global/api"
 import appErrorMessages from "../../../global/appErrorMessages";
-import googleCloudStorage from "../../../services/googleCloudStorage";
 
 async function get(req:Request, res:Response )
 {
@@ -44,20 +43,30 @@ async function list(req:Request, res:Response )
 {
     try{    
     const page = req.query.page
+    const subjectId = req.query.subjectId
+    const search = req.query.search
 
-    if (page == "")
+    if (page == "" || subjectId == "")
     {
         return res.status(400).json({
-            message:"page id is required"
+            message:"page  or subjectId  is required"
         })
     }
-        const apiRes = await api.get(`course/list?page=${page}`)
+
+      
+        let searchString = search !== "" && search !== "null" ? `course/ListbySubject?page=${page}&subjectId=${subjectId}&search=${search}` : `course/ListbySubject?page=${page}&subjectId=${subjectId}`
+
+      
+        
+
+        const apiRes = await api.get(searchString)
 
         return res.json(apiRes.data)
 
     }
     catch(e:any)
     {
+        console.log(e);
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
@@ -123,7 +132,7 @@ async function putImage(req:Request, res:Response )
                 message:"course id is required"
             })
         }
-
+/*
         try{
             // delete last file 
             const responseData = await api.get(`/course/${id}`)
@@ -140,7 +149,7 @@ async function putImage(req:Request, res:Response )
             console.log(e);
             
         }
-        
+  */      
   
         const user = await api.put(`/course/image/${id}`,{
             imgUrl:req.file?.filename
@@ -172,35 +181,33 @@ async function putImage(req:Request, res:Response )
 
 async function put(req:Request, res:Response )
 {
-    try{    
-
-    const {
-        subjectId,
-        name,
-        description,
-        price
-
-    } = req.body
-    const id = req.params.id
-
-    if (id == "")
-    {
-        return res.status(400).json({
-            message:"course id is required"
-        })
-    }
-
-    if (subjectId == null || name == "" || description == "" || price == null )
-    {
-        return res.status(400).json({
-            message:appErrorMessages.parametersError
-        })
-    }
-        const apiRes = await api.put(`course`,{
-            subjectId,
+    try{  
+        const {
             name,
             description,
-            price
+        } = req.body
+        const id = req.params.id
+
+        if (id == "")
+        {
+            return res.status(400).json({
+                message:"course id is required"
+            })
+        }
+
+
+        if ( name === "" || description === ""  )
+        {
+            return res.status(400).json({
+                message:appErrorMessages.parametersError
+            })
+        }
+
+        const apiRes = await api.put(`course/${id}`,{
+         
+            Name:name,
+            Description:description,
+            Price:0
        
         })
 
@@ -209,6 +216,7 @@ async function put(req:Request, res:Response )
     }
     catch(e:any)
     {
+        console.log(e);
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
@@ -230,26 +238,27 @@ async function put(req:Request, res:Response )
 async function post(req:Request, res:Response )
 {
     try{    
-    const {
-        subjectId,
-        name,
-        description,
-        price,
+        const {
+            subjectId,
+            name,
+            description,
         
-    } = req.body
+            
+        } = req.body
 
 
-    if (subjectId == null || name == "" || description == "" || price == null )
-    {
-        return res.status(400).json({
-            message:appErrorMessages.parametersError
-        })
-    }
+        if (subjectId == null || name == "" || description == ""  )
+        {
+            return res.status(400).json({
+                message:appErrorMessages.parametersError
+            })
+        }
+
         const apiRes = await api.post(`course`,{
             subjectId,
             name,
             description,
-            price
+            price:0
       
         })
 

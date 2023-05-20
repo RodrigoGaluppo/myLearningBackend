@@ -66,9 +66,8 @@ async function list(req:ICustomerAuthenticated, res:Response )
             message:"page is required"
         })
     }
-
     
-    const apiRes = await api.get(`chapter/list/${courseId}?page=${page}`)
+    const apiRes = await api.get(`chapter/listbyCourseId/${courseId}?page=${page}`)
 
     return res.json(apiRes.data)
 

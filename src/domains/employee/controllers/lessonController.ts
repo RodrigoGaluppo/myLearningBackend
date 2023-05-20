@@ -21,7 +21,7 @@ async function get(req:Request, res:Response )
     }
     catch(e:any)
     {
-        
+    
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
             return res
@@ -120,7 +120,6 @@ async function put(req:Request, res:Response )
     try{    
 
     const {
-        chapterId,
         title,
         description
     } = req.body
@@ -133,15 +132,14 @@ async function put(req:Request, res:Response )
         })
     }
 
-    if (title == "" || chapterId == "" || description == "")
+    if (title == ""  || description == "")
     {
         return res.status(400).json({
             message:appErrorMessages.parametersError
         })
     }
 
-    const apiRes = await api.put(`lesson`,{
-        chapterId,
+    const apiRes = await api.put(`lesson/${id}`,{
         title,
         description
     })

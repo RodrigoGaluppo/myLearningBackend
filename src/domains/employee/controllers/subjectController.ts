@@ -7,7 +7,8 @@ async function get(req:Request, res:Response )
     
     try{    
     const id = req.params.id
-
+       
+        
     if (id == "")
     {
         return res.status(400).json({
@@ -21,6 +22,7 @@ async function get(req:Request, res:Response )
     }
     catch(e:any)
     {
+        console.log(e);
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
@@ -42,9 +44,10 @@ async function get(req:Request, res:Response )
 async function list(req:Request, res:Response )
 {
     try{    
-
+        
     const page = req.query.page
-
+    const search = req.query.search
+    
     
     if (page == null)
     {
@@ -53,8 +56,9 @@ async function list(req:Request, res:Response )
         })
     }
 
+    let searchString = !!search && search != "null" ? `subject/list/?page=${page}&search=${search}` : `subject/list/?page=${page}` 
     
-    const apiRes = await api.get(`subject/list/?page=${page}`)
+    const apiRes = await api.get(searchString)
 
     return res.json(apiRes.data)
 
@@ -124,7 +128,7 @@ async function put(req:Request, res:Response )
 
       } = req.body
     const id = req.params.id
-
+   
     if (id == "")
     {
         return res.status(400).json({
@@ -139,16 +143,17 @@ async function put(req:Request, res:Response )
         })
     }
 
-    const apiRes = await api.put(`subject`,{
+    const apiRes = await api.put(`subject/${id}`,{
         name,
 
         })
-
+        
     return res.json(apiRes.data)
 
     }
     catch(e:any)
     {
+        console.log(e);
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  

@@ -51,13 +51,14 @@ async function del(req:Request, res:Response )
             message:"rerourceLesson id is required"
         })
     }
-        const apiRes = await api.delete(`rerourceLesson/${id}`)
+    const apiRes = await api.delete(`resourceLesson/${id}`)
 
-        return res.json(apiRes.data)
+    return res.json(apiRes.data)
 
     }
     catch(e:any)
     {
+        console.log(e);
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
@@ -146,10 +147,10 @@ async function post(req:Request, res:Response )
         })
     }
 
-    const apiRes = await api.post(`ressourceLesson`,{
-        lessonId,
-        title,
-        link 
+    const apiRes = await api.post(`resourceLesson`,{
+        LessonId:lessonId,
+        Title:title,
+        Link:link 
     })
 
     return res.json(apiRes.data)

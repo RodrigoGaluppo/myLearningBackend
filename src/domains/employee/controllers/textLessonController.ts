@@ -146,10 +146,10 @@ async function post(req:Request, res:Response )
         })
     }
 
-    const apiRes = await api.post(`ressourceLesson`,{
-        lessonId,
-        title,
-        content 
+    const apiRes = await api.post(`textLesson`,{
+        LessonId:lessonId,
+        Title:title,
+        Content:content 
     })
 
     return res.json(apiRes.data)
