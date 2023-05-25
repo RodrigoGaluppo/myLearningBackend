@@ -29,7 +29,7 @@ const auth = async (req:IEmployeeAuthenticated, res:Response,next:NextFunction)=
                 
                             req.employee  = {
                                 id:sub,
-                                role:employee.EmployeeroleId
+                                employeeRole:employee.employeeRole
                             }
                             next()
                         })

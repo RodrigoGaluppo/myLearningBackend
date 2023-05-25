@@ -11,6 +11,7 @@ import customerController from "./controllers/customerController";
 import employeeAuth from "../../middlewares/employeeAuth";
 import uploadImg from "../../middlewares/uploadImg";
 import uploadVideo from "../../middlewares/uploadVideo";
+import isEmployeeAdmin from "../../middlewares/isEmployeeAdmin";
 
 const employeeRouter = Router();
 
@@ -58,15 +59,18 @@ employeeRouter.post("/employee/textLesson/",employeeAuth,textLessonController.po
 employeeRouter.delete("/employee/textLesson/:id",employeeAuth,textLessonController.del)
 
 
-employeeRouter.get("/employee/list/",employeeAuth,employeeController.list)
+employeeRouter.get("/employee/list/",employeeAuth,isEmployeeAdmin,employeeController.list)
 employeeRouter.post("/employee/login",employeeController.login)
-employeeRouter.post("/employee",employeeAuth,employeeController.post)
-employeeRouter.get("/employee/:id",employeeAuth,employeeController.get)
-employeeRouter.put("/employee/:id",employeeAuth,employeeController.put)
+employeeRouter.post("/employee",employeeAuth,isEmployeeAdmin,employeeController.post)
+employeeRouter.get("/employee/:id",employeeAuth,isEmployeeAdmin,employeeController.get)
+employeeRouter.put("/employee/:id",employeeAuth,isEmployeeAdmin,employeeController.put)
 
-
-employeeRouter.get("/employee/customer/",employeeAuth,customerController.list)
+employeeRouter.post("/employee/customer/",employeeAuth,customerController.post)
+employeeRouter.get("/employee/customer/list",employeeAuth,customerController.list)
+employeeRouter.delete("/employee/customer/:id",employeeAuth,customerController.del)
 employeeRouter.get("/employee/customer/:id",employeeAuth,customerController.get)
 employeeRouter.put("/employee/customer/active/:id",employeeAuth,customerController.changeActiveStatus)
+employeeRouter.put("/employee/customer/:id",employeeAuth,customerController.put)
+
 
 export default employeeRouter;

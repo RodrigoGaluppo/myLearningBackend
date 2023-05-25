@@ -51,6 +51,8 @@ async function del(req:Request, res:Response )
                 message:"textLesson id is required"
             })
         }
+
+        
         const apiRes = await api.delete(`textLesson/${id}`)
 
         return res.json(apiRes.data)

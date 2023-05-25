@@ -42,22 +42,18 @@ async function get(req:Request, res:Response )
 async function list(req:Request, res:Response )
 {
     try{    
-    const page = req.query.page
-    const subjectId = req.query.subjectId
-    const search = req.query.search
+        const page = req.query.page
+        const subjectId = req.query.subjectId
+        const search = req.query.search
 
-    if (page == "" || subjectId == "")
-    {
-        return res.status(400).json({
-            message:"page  or subjectId  is required"
-        })
-    }
-
+        if (page == "" || subjectId == "")
+        {
+            return res.status(400).json({
+                message:"page  or subjectId  is required"
+            })
+        }
       
         let searchString = search !== "" && search !== "null" ? `course/ListbySubject?page=${page}&subjectId=${subjectId}&search=${search}` : `course/ListbySubject?page=${page}&subjectId=${subjectId}`
-
-      
-        
 
         const apiRes = await api.get(searchString)
 
@@ -96,13 +92,15 @@ async function del(req:Request, res:Response )
             message:"course id is required"
         })
     }
-        const apiRes = await api.delete(`course/${id}`)
 
+        const apiRes = await api.delete(`course/${id}`)
+    
         return res.json(apiRes.data)
 
     }
     catch(e:any)
     {
+        
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  

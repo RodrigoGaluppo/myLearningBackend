@@ -1,12 +1,12 @@
 import { Request,Response } from "express";
 import api from "../../../global/api"
-import ICustomerAuthenticated from "../../../global/ICustomerAuthenticated";
+import IEmployyeAuthenticated from "../../../global/IEmployeeAuthenticated";
 
 
-async function get(req:ICustomerAuthenticated, res:Response )
+async function get(req:IEmployyeAuthenticated, res:Response )
 {
     try{    
-    const id = req?.customer?.id
+    const id = req?.params?.id
 
     if (id == "")
     {
@@ -15,6 +15,100 @@ async function get(req:ICustomerAuthenticated, res:Response )
         })
     }
         const apiRes = await api.get(`customer/${id}`)
+
+        return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
+async function post(req:Request, res:Response )
+{
+    try{    
+
+    let {
+        firstName,
+        lastName,
+        email,
+        username,
+        password,
+        gender,
+        birthDate
+    } = req.body
+
+    if (firstName == "" || lastName == "" || email == "" || username == "" || password == "" || gender == "" || birthDate == "")
+    {
+
+        return res.status(400).json({
+            message:"required parameters not supplied"
+        })
+    }
+
+        const apiRes = await api.post("customer",
+        {
+            firstName,
+            lastName,
+            email,
+            username,
+            password,
+            gender,
+            birthDate
+        }
+        )
+
+        return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
+async function del(req:IEmployyeAuthenticated, res:Response )
+{
+    try{    
+        const id = req.params.id
+
+        if (id == "")
+        {
+            return res.status(400).json({
+                message:"customer id is required"
+            })
+        }
+        
+        const apiRes = await api.delete(`customer/${id}`)
 
         return res.json(apiRes.data)
 
@@ -55,6 +149,8 @@ async function changeActiveStatus(req:Request, res:Response )
             message:"required parameters not supplied"
         })
     }
+
+        
         const apiRes = await api.put(`customer/active/${id}`,{
             active
         })
@@ -82,27 +178,98 @@ async function changeActiveStatus(req:Request, res:Response )
     
 }
 
-async function list(req:ICustomerAuthenticated, res:Response )
+async function put(req:IEmployyeAuthenticated, res:Response )
 {
     try{    
 
-    const page = req.params.page
+    const id = req?.params.id
     
-    if (page == null)
+    let {
+        firstName,
+        lastName,
+        email,
+        username,
+        gender,
+        birthDate
+    } = req.body
+
+    if (id == "")
     {
         return res.status(400).json({
-            message:"page is required"
+            message:"customer id is required"
         })
     }
 
-    
-    const apiRes = await api.get(`customer/list/?page=${page}`)
+    if (firstName == "" || lastName == "" || email == "" || username == "" || gender == "" || birthDate == "")
+    {
+
+        return res.status(400).json({
+            message:"required parameters not supplied"
+        })
+    }
+
+    const apiRes = await api.put(`customer/${id}`,{
+        firstName,
+        lastName,
+        email,
+        username,
+        gender,
+        birthDate
+    })
+
 
     return res.json(apiRes.data)
+
 
     }
     catch(e:any)
     {
+        console.log(e);
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
+
+async function list(req:IEmployyeAuthenticated, res:Response )
+{
+    try{    
+        
+        
+        const page = req.query.page
+        const search = req.query.search
+
+        if (page == "" )
+        {
+            return res.status(400).json({
+                message:"page  is required"
+            })
+        }
+      
+        let searchString = search !== "" && search !== "null" ? `customer/list?page=${page}&search=${search}` : `customer/list?page=${page}`
+   
+        const apiRes = await api.get(searchString)
+       
+        
+        return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+    
+      
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
@@ -124,5 +291,8 @@ async function list(req:ICustomerAuthenticated, res:Response )
 export default {
     list,
     get,
-    changeActiveStatus
+    del,
+    changeActiveStatus,
+    post,
+    put
 }

@@ -80,7 +80,7 @@ async function get(req:IEmployeeAuthenticated, res:Response )
 {
     try{    
 
-        const employeeRole = req.employee?.role
+        const employeeRole = req.employee?.employeeRole
 
         if(employeeRole == undefined){
             return res.status(400).json({
@@ -134,19 +134,7 @@ async function put(req:IEmployeeAuthenticated, res:Response )
 {
     try{    
 
-        const employeeRole = req.employee?.role
-
-        if(employeeRole == undefined){
-            return res.status(400).json({
-                message:appErrorMessages.parametersError
-            })
-        }
-
-        if( employeeRole > 1){
-            return res.status(400).json({
-                message:appErrorMessages.permissionError
-            })
-        }
+     
 
         const {employeeId} = req.params
         
@@ -201,28 +189,25 @@ async function put(req:IEmployeeAuthenticated, res:Response )
 async function list(req:IEmployeeAuthenticated, res:Response )
 {
     try{  
-          
-    const employeeRole = req.employee?.role
+  
 
-    if(employeeRole == undefined){
-        return res.status(400).json({
-            message:appErrorMessages.parametersError
-        })
-    }
+        const page = req.query.page
+        const search = req.query.search
 
-    const page = req.params.page
+        if (page == "" )
+        {
+            return res.status(400).json({
+                message:"page  is required"
+            })
+        }
+      
+        let searchString = search !== "" && search !== "null" ? `employee/list?page=${page}&search=${search}` : `employee/list?page=${page}`
+   
     
-    if (page == null)
-    {
-        return res.status(400).json({
-            message:"page is required"
-        })
-    }
-
     
-    const apiRes = await api.get(`employee/list/?page=${page}`)
+        const apiRes = await api.get(searchString)
 
-    return res.json(apiRes.data)
+        return res.json(apiRes.data)
 
     }
     catch(e:any)
@@ -249,7 +234,7 @@ async function post(req:IEmployeeAuthenticated, res:Response )
 {
     try{ 
         
-         /* const employeeRole = req.employee?.role
+         /* const employeeRole = req.employee?.employeeRole
 
         if(employeeRole == undefined){
             return res.status(400).json({
@@ -265,15 +250,16 @@ async function post(req:IEmployeeAuthenticated, res:Response )
             
 
         let {
-            employeeroleId,
+         
             name,
             email,
             password,
             gender,
-            birthDate
+            birthDate,
+            employeeRole
         } = req.body
 
-        if (employeeroleId == null || name == "" || email == ""  || password == "" || gender == "" || birthDate == "")
+        if ( name == "" || email == ""  || password == "" || gender == "" || birthDate == "" || employeeRole == "")
         {
 
             return res.status(400).json({
@@ -282,14 +268,14 @@ async function post(req:IEmployeeAuthenticated, res:Response )
         }
 
             const apiRes = await api.post("employee",
-            {
-                employeeroleId,
-                name,
-                email,
-                password,
-                gender,
-                birthDate
-            }
+                {
+                    Name:name,
+                    Email:email,
+                    Password:password,
+                    Gender:gender,
+                    BirthDate:birthDate,
+                    EmployeeRole:employeeRole
+                }
             )
 
             return res.json(apiRes.data)
