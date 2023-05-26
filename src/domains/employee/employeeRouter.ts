@@ -64,6 +64,7 @@ employeeRouter.post("/employee/login",employeeController.login)
 employeeRouter.post("/employee",employeeAuth,isEmployeeAdmin,employeeController.post)
 employeeRouter.get("/employee/:id",employeeAuth,isEmployeeAdmin,employeeController.get)
 employeeRouter.put("/employee/:id",employeeAuth,isEmployeeAdmin,employeeController.put)
+employeeRouter.delete("/employee/:id",employeeAuth,isEmployeeAdmin,employeeController.del)
 
 employeeRouter.post("/employee/customer/",employeeAuth,customerController.post)
 employeeRouter.get("/employee/customer/list",employeeAuth,customerController.list)

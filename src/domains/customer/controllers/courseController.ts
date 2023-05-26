@@ -57,6 +57,7 @@ async function list(req:ICustomerAuthenticated, res:Response )
     
     try{    
     const page = req.query.page
+    const search = req.query.search
 
     if (page == "")
     {
@@ -64,9 +65,12 @@ async function list(req:ICustomerAuthenticated, res:Response )
             message:"page id is required"
         })
     }
-        const apiRes = await api.get(`course/listbyCustomer?page=${page}&customerId=${req.customer?.id}`)
 
-        return res.json(apiRes.data)
+    let searchString = search !== "" && search !== "null" ? `course/listbyCustomer?page=${page}&customerId=${req.customer?.id}&search=${search}` : `course/listbyCustomer?page=${page}&customerId=${req.customer?.id}`
+
+    const apiRes = await api.get(searchString)
+
+    return res.json(apiRes.data)
 
     }
     catch(e:any)

@@ -88,7 +88,7 @@ async function get(req:IEmployeeAuthenticated, res:Response )
             })
         }
 
-        const {id} = req.route
+        const {id} = req.params
 
         if (id == "")
         {
@@ -130,24 +130,72 @@ async function get(req:IEmployeeAuthenticated, res:Response )
     
 }
 
+async function del(req:IEmployeeAuthenticated, res:Response )
+{
+    try{    
+
+
+        const {id} = req.params
+
+        if (id == "")
+        {
+            return res.status(400).json({
+                message:"employee id is required"
+            })
+        }
+       
+        
+
+        if(id == req.employee?.id){
+            return res.status(400).json({
+                message:"you can not delete yourself"
+            })
+        }
+
+
+
+        const apiRes = await api.delete(`employee/${id}`)
+
+        return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
 async function put(req:IEmployeeAuthenticated, res:Response )
 {
     try{    
 
-     
-
-        const {employeeId} = req.params
+        const {id} = req.params
         
         let {
             name,
             email,
-            username,
+            employeeRole,
             gender,
-            birthDate
+            birthDate,
+        
         } = req.body
 
 
-        if (name == "" || email == "" || username == "" || gender == "" || birthDate == "" || employeeId == "")
+        if (name == "" || email == "" || employeeRole == "" || gender == "" || birthDate == "" || id == "")
         {
 
             return res.status(400).json({
@@ -155,14 +203,21 @@ async function put(req:IEmployeeAuthenticated, res:Response )
             })
         }
 
-        const apiRes = await api.put(`employee/${employeeId}`,{
-            name,
-            email,
-            username,
-            gender,
-            birthDate
+        if(id == req.employee?.id && employeeRole != req.employee.employeeRole){
+            return res.status(400).json({
+                message:"can not change your own role"
+            })
+        }
+        
+     
+        const apiRes = await api.put(`employee/${id}`,{
+            Name:name,
+            Email:email,
+            EmployeeRole:employeeRole,
+            Gender:gender,
+            Birthdate:birthDate
         })
-
+       
         return res.json(apiRes.data)
 
     }
@@ -234,21 +289,7 @@ async function post(req:IEmployeeAuthenticated, res:Response )
 {
     try{ 
         
-         /* const employeeRole = req.employee?.employeeRole
-
-        if(employeeRole == undefined){
-            return res.status(400).json({
-                message:appErrorMessages.parametersError
-            })
-        }
-
-        if( employeeRole > 1){
-            return res.status(400).json({
-                message:appErrorMessages.permissionError
-            })
-        }*/
-            
-
+        
         let {
          
             name,
@@ -306,5 +347,6 @@ export default {
     login,
     get,
     put,
-    list
+    list,
+    del
 }

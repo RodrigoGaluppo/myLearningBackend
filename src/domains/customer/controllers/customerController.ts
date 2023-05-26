@@ -222,7 +222,7 @@ async function put(req:ICustomerAuthenticated, res:Response )
     let {
         firstName,
         lastName,
-        email,
+
         username,
         gender,
         birthDate
@@ -235,7 +235,7 @@ async function put(req:ICustomerAuthenticated, res:Response )
         })
     }
 
-    if (firstName == "" || lastName == "" || email == "" || username == "" || gender == "" || birthDate == "")
+    if (firstName == "" || lastName == ""  || username == "" || gender == "" || birthDate == "")
     {
 
         return res.status(400).json({
@@ -246,7 +246,7 @@ async function put(req:ICustomerAuthenticated, res:Response )
     const apiRes = await api.put(`customer/${id}`,{
         firstName,
         lastName,
-        email,
+
         username,
         gender,
         birthDate
