@@ -19,10 +19,10 @@ customerRouter.put("/customer/",customerAuth,customerController.put)
 
 customerRouter.put("/customer/image/",customerAuth,uploadImg,customerController.putImage)
 
-
+customerRouter.post("/customer/course/",customerAuth,courseController.post)
+customerRouter.delete("/customer/course/:id",customerAuth,courseController.del)
 customerRouter.get("/customer/course/list/",customerAuth,courseController.list)
 customerRouter.get("/customer/course/:id",customerAuth,courseController.get)
-
 customerRouter.get("/customer/chapter/list/:courseId",customerAuth,chapterController.list)
 customerRouter.get("/customer/chapter/:id",customerAuth,chapterController.get)
 
@@ -41,6 +41,7 @@ customerRouter.get("/customer/certificate/",customerAuth,certificateController.g
 
 customerRouter.get("/customer/question/list/",customerAuth,questionController.list)
 customerRouter.get("/customer/question/:id",customerAuth,questionController.get)
+customerRouter.delete("/customer/question/:id",customerAuth,questionController.del)
 customerRouter.post("/customer/question/",customerAuth,questionController.post)
 
 

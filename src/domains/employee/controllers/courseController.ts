@@ -233,6 +233,52 @@ async function put(req:Request, res:Response )
     
 }
 
+async function changeActiveStatus(req:Request, res:Response )
+{
+    try{    
+    
+        
+    const {id} = req.params
+    
+    let {
+        active
+    } = req.body
+
+    if (id == "" || active == null)
+    {
+        return res.status(400).json({
+            message:"required parameters not supplied"
+        })
+    }
+  
+        const apiRes = await api.put(`course/active/${id}`,{
+           Active: active
+        })
+       
+        return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+        console.log(e);
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
 async function post(req:Request, res:Response )
 {
     try{    
@@ -289,5 +335,6 @@ export default {
     list,
     putImage,
     post,
-    del
+    del,
+    changeActiveStatus
 }

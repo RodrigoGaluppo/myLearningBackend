@@ -17,6 +17,13 @@ async function login(req:Request,res:Response){
             })
         }
 
+        const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+        console.log( req.headers['X-Client-IP']);
+        
+       
+        
+
         email = email.toLowerCase()
         const JWTSECRET = process.env.JWTSECRET
 
@@ -222,7 +229,6 @@ async function put(req:ICustomerAuthenticated, res:Response )
     let {
         firstName,
         lastName,
-
         username,
         gender,
         birthDate

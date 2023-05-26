@@ -27,6 +27,7 @@ employeeRouter.put("/employee/course/image/:id",employeeAuth,uploadImg,courseCon
 employeeRouter.put("/employee/course/:id",employeeAuth,courseController.put)
 employeeRouter.post("/employee/course/",employeeAuth,courseController.post)
 employeeRouter.delete("/employee/course/:id",employeeAuth,courseController.del)
+employeeRouter.put("/employee/course/active/:id",employeeAuth,courseController.changeActiveStatus)
 
 
 employeeRouter.get("/employee/chapter/list/:courseId",employeeAuth,chapterController.list)

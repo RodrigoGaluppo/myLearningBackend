@@ -3,7 +3,7 @@ import api from "../../../global/api"
 import ICustomerAuthenticated from "../../../global/ICustomerAuthenticated";
 import IAuthenticatedInterface from "../../../global/ICustomerAuthenticated";
 
-
+// method to load user's course page
 async function get(req:IAuthenticatedInterface, res:Response )
 {
     try{    
@@ -51,9 +51,47 @@ async function get(req:IAuthenticatedInterface, res:Response )
     
 }
 
+// method to delist user's course
+async function del(req:IAuthenticatedInterface, res:Response )
+{
+    try{    
+        const id = req.params.id
+        const customerId = req.customer?.id
+
+        if (id == "" || customerId == "" )
+        {
+            return res.status(400).json({
+                message:"course id and customer id are required"
+            })
+        }
+
+        const customerCourseRes = await api.delete(`customercourse?customerId=${customerId}&courseId=${id}`) // verify if user has access to this course
+       
+        return res.json(customerCourseRes.data)
+    }
+    catch(e:any)
+    {
+        console.log(e);
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
 async function list(req:ICustomerAuthenticated, res:Response )
 {
-    
     
     try{    
     const page = req.query.page
@@ -95,7 +133,50 @@ async function list(req:ICustomerAuthenticated, res:Response )
     
 }
 
+// method to roll user to course
+async function post(req:IAuthenticatedInterface, res:Response )
+{
+    try{    
+
+        const courseId = req.body.courseId
+        const customerId = req.customer?.id
+       
+        if (courseId == "" || customerId == "" )
+        {
+            return res.status(400).json({
+                message:"course id and customer id are required"
+            })
+        }
+
+        const customerCourse = await api.post(`customerCourse`,{
+            CustomerId:customerId,
+            CourseId:courseId
+        }) 
+                
+        return res.json({...customerCourse.data})
+   
+    }
+    catch(e:any)
+    {
+        console.log(e);
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
 
 export default {
-    get,list
+    get,list,post,del
 }

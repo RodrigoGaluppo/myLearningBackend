@@ -85,6 +85,45 @@ async function get(req:IAuthenticatedInterface, res:Response )
     
 }
 
+async function del(req:IAuthenticatedInterface, res:Response )
+{
+    try{    
+        const id = req.params.id
+        const customerId = req.customer?.id
+
+        if (id == "" || customerId == "" )
+        {
+            return res.status(400).json({
+                message:"question id and customer id are required"
+            })
+        }
+
+        const questionRes = await api.delete(`question/${id}`) // verify if user has access to this course
+
+        return res.json(questionRes.data)
+       
+    }
+    catch(e:any)
+    {
+        console.log(e);
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
 async function list(req:ICustomerAuthenticated, res:Response )
 {
     
@@ -135,5 +174,5 @@ async function list(req:ICustomerAuthenticated, res:Response )
 
 
 export default {
-    get,list,post
+    get,list,post,del
 }
