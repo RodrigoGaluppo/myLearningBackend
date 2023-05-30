@@ -3,8 +3,58 @@ import jwt from "jsonwebtoken"
 import api from "../../../global/api"
 import path from "path"
 import containerClient from "../../../services/azureStorage"
-
 import ICustomerAuthenticated from "../../../global/ICustomerAuthenticated";
+import mailSender from "../../../services/mailSender";
+import tokenService from "../../../services/mongoDB/tokenService";
+
+async function sendChangePasswordEmail(req:Request,res:Response){
+
+    try{
+        let {email}:{email:string} = req.body
+
+        if(email == "" ){
+            return res.status(400).json({
+                message:"required parameters not supplied"
+            })
+        }
+
+        const apiRes = await api.get(`customer/getCustomerByEmail/${email}`)
+
+        if(!apiRes.data ){
+            return res.status(500).json({
+                message:"not found"
+            })
+        }
+      
+        const tokenId = await tokenService.createToken(apiRes.data?.id)
+
+        await mailSender.sendChangePasswordEmail({
+            name: String(apiRes.data?.firstName),
+            email:String(apiRes.data?.email),
+            tokenId
+        })
+
+        return res.json({
+            message:"ok"
+        })
+
+    }
+    catch(e:any){
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+}
 
 async function login(req:Request,res:Response){
 
@@ -17,23 +67,26 @@ async function login(req:Request,res:Response){
             })
         }
 
-        const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-
-        console.log( req.headers['X-Client-IP']);
-        
-       
-        
-
         email = email.toLowerCase()
         const JWTSECRET = process.env.JWTSECRET
 
         api.post("customer/login",{
             email,password
         })
-        .then((response)=>{
+        .then(async (response)=>{
 
-            const {id} = response.data
-            
+            const {id,active,isConfirmed} = response.data
+
+            if(!active){
+                res.status(403)
+                return res.json({"message":"your account is not active, it may be suspended"})
+            }
+
+            if(!isConfirmed){
+                res.status(402)
+                return res.json({"message":"your email has not been verified, check your mail box"})
+            }
+
             if(JWTSECRET){
                 jwt.sign({user_id:id},JWTSECRET,{subject:id,expiresIn:"1d"},
                 (err,token)=>{
@@ -220,6 +273,46 @@ async function changeActiveStatus(req:ICustomerAuthenticated, res:Response )
     
 }
 
+async function changeConfirmedStatus(req:ICustomerAuthenticated, res:Response )
+{
+    try{    
+
+    const id = req?.params?.id
+    
+    if (id == "" )
+    {
+        return res.status(400).json({
+            message:"required parameters not supplied"
+        })
+    }
+    
+    const apiRes = await api.put(`customer/confirm/${id}`,{
+        isConfirmed:true
+    })
+
+    return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
 async function put(req:ICustomerAuthenticated, res:Response )
 {
     try{    
@@ -263,6 +356,63 @@ async function put(req:ICustomerAuthenticated, res:Response )
     }
     catch(e:any)
     {
+        
+        if(e.response != null && e?.response?.status != null && e?.response?.data != null)
+        {  
+            return res
+                .status(e?.response?.status)
+                .json({
+                    message:e.response.data
+                })
+        }
+        
+        return res.status(500).json({
+            message:"app error"
+        })
+    }
+
+    
+}
+
+async function changePassword(req:Request, res:Response )
+{
+    try{    
+
+    const tokenId = req.params.tokenId
+    
+    let {
+        newPassword
+    } = req.body
+
+    if (newPassword == "" || tokenId == "")
+    {
+        return res.status(400).json({
+            message:"you must provide token id and new password"
+        })
+    }
+
+    const isTokenValid = await tokenService.isTokenValid(tokenId)
+
+    if(!isTokenValid){
+        return res.status(403).json({
+            message:"invalid token"
+        })
+    }
+
+    const customerId = await tokenService.getCustomerIdByTokenId(tokenId)
+    
+    const apiRes = await api.put(`customer/changePassword/${customerId}`,{
+        Password:newPassword
+    })
+
+    await tokenService.setTokenUsed(tokenId)
+
+    return res.json(apiRes.data)
+
+    }
+    catch(e:any)
+    {
+        console.log(e);
         
         if(e.response != null && e?.response?.status != null && e?.response?.data != null)
         {  
@@ -342,19 +492,30 @@ async function post(req:Request, res:Response )
         })
     }
 
-        const apiRes = await api.post("customer",
-        {
-            firstName,
-            lastName,
-            email,
-            username,
-            password,
-            gender,
-            birthDate
-        }
-        )
+            const apiRes = await api.post("customer",
+            {
+                firstName,
+                lastName,
+                email,
+                username,
+                password,
+                gender,
+                birthDate
+            }
+            )
+            // send confirmation email
+            try{
+                await mailSender.sendVerifyEmail({
+                    name:firstName,
+                    email,
+                    id:apiRes.data.id
+                })
+            }catch(err){
+                console.log(err);
+                
+            }
 
-        return res.json(apiRes.data)
+            return res.json(apiRes.data)
 
     }
     catch(e:any)
@@ -377,12 +538,15 @@ async function post(req:Request, res:Response )
     
 }
 
+
+
 export default {
     post,
     login,
     get,
     changeActiveStatus,
-    put,
-    putImage,
-    list
+    changeConfirmedStatus,
+    changePassword,
+    sendChangePasswordEmail,
+    put
 }

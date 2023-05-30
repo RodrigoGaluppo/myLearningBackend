@@ -1,6 +1,7 @@
 import { Request,Response } from "express";
 import api from "../../../global/api"
 import IEmployyeAuthenticated from "../../../global/IEmployeeAuthenticated";
+import mailSender from "../../../services/mailSender";
 
 
 async function get(req:IEmployyeAuthenticated, res:Response )
@@ -73,6 +74,18 @@ async function post(req:Request, res:Response )
         }
         )
 
+        // send confirmation email
+        try{
+            await mailSender.sendVerifyEmail({
+                name:firstName,
+                email,
+                id:apiRes.data.id
+            })
+        }catch(err){
+            console.log(err);
+            
+        }
+
         return res.json(apiRes.data)
 
     }
@@ -137,23 +150,41 @@ async function changeActiveStatus(req:Request, res:Response )
 {
     try{    
 
-    const {id} = req.params
+        const {id} = req.params
     
-    let {
-        active
-    } = req.body
+        let {
+            active
+        } = req.body
 
-    if (id == "" || active == null)
-    {
-        return res.status(400).json({
-            message:"required parameters not supplied"
-        })
-    }
-
+        if (id == "" || active == null)
+        {
+            return res.status(400).json({
+                message:"required parameters not supplied"
+            })
+        }
         
         const apiRes = await api.put(`customer/active/${id}`,{
             active
         })
+
+        try{
+            if(!!active){
+                await mailSender.sendEnabledAccountEmail({
+                    email:apiRes?.data?.email,
+                    name:apiRes?.data?.firstName
+                })
+            }
+            else{
+                await mailSender.sendSuspendedAccountEmail({
+                    email:apiRes?.data?.email,
+                    name:apiRes?.data?.firstName
+                })
+            }
+        }
+        catch{
+            console.log("could not send email");
+            
+        }
 
         return res.json(apiRes.data)
 
@@ -241,7 +272,6 @@ async function put(req:IEmployyeAuthenticated, res:Response )
 
     
 }
-
 
 async function list(req:IEmployyeAuthenticated, res:Response )
 {

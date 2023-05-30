@@ -4,10 +4,14 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "@azure/data-tables": "^13.2.2",
     "@azure/storage-blob": "^12.14.0",
     "@google-cloud/storage": "^6.9.0",
     "@mux/mux-node": "^7.0.0",
+    "@types/ejs": "^3.1.2",
     "@types/jsonwebtoken": "^9.0.0",
+    "@types/mongodb": "^4.0.7",
+    "@types/mongoose": "^5.11.97",
     "aws-sdk": "^2.1290.0",
     "axios": "^1.2.2",
     "bcrypt": "^5.1.0",
@@ -19,8 +23,12 @@
     "html-pdf-node": "^1.0.8",
     "html2pdf": "^0.0.11",
     "jsonwebtoken": "^9.0.0",
+    "mongodb": "^5.5.0",
+    "mongoose": "^7.2.1",
     "multer": "^1.4.5-lts.1",
-    "sharp": "^0.31.3"
+    "sharp": "^0.31.3",
+    "sib-api-v3-sdk": "^8.5.0",
+    "uuidv4": "^6.2.13"
   },
   "scripts": {
     "dev": "ts-node-dev --transpile-only --ignore-watch node_modules --respawn src/app.ts"

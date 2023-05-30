@@ -3,7 +3,6 @@ import api from "../../../global/api"
 import ICustomerAuthenticated from "../../../global/ICustomerAuthenticated";
 import IAuthenticatedInterface from "../../../global/ICustomerAuthenticated";
 
-
 async function post(req:IAuthenticatedInterface, res:Response )
 {
     try{

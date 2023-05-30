@@ -4,6 +4,8 @@ const pdf = require("html-pdf-node")
 const ejs = require('ejs');
 import stream from 'stream';
 
+// service to generate certificate pdf
+
 interface ICertificateData{
     user:string
     course:string

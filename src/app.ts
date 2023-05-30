@@ -5,6 +5,7 @@ import {swaggerDocument} from './swagger';
 import customerRouter from './domains/customer/customerRouter';
 import employeeRouter from './domains/employee/employeeRouter';
 import anonymousRouter from './domains/anonymous/anonymousRouter';
+import mongoose from 'mongoose';
 require('dotenv').config({ path: __dirname+'/.env' });
 
 var cors = require('cors');
@@ -25,6 +26,13 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 const PORT = process.env.PORT || 8080;
+
+
+mongoose.connect(String(process.env.MONGODBCONSTRING))
+.then(()=>{
+    app.emit('ready')
+})
+.catch(e=>console.log(e))
 
 app.use("/api-docs", swagger.serve, swagger.setup(swaggerDocument));
 

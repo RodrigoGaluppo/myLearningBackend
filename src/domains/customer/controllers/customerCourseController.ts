@@ -81,7 +81,6 @@ async function list(req:ICustomerAuthenticated, res:Response )
 }
 
 
-
 export default {
     get,
     list

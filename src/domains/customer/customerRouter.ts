@@ -12,12 +12,14 @@ import commentController from "./controllers/commentController";
 
 const customerRouter = Router();
 
+customerRouter.put("/customer/confirm/:id",customerController.changeConfirmedStatus)
+customerRouter.put("/customer/changepassword/:tokenId",customerController.changePassword)
 customerRouter.post("/customer/login",customerController.login)
 customerRouter.post("/customer",customerController.post)
+customerRouter.post("/customer/forgotPassword",customerController.sendChangePasswordEmail)
 customerRouter.get("/customer/",customerAuth,customerController.get)
 customerRouter.put("/customer/",customerAuth,customerController.put)
 
-customerRouter.put("/customer/image/",customerAuth,uploadImg,customerController.putImage)
 
 customerRouter.post("/customer/course/",customerAuth,courseController.post)
 customerRouter.delete("/customer/course/:id",customerAuth,courseController.del)
@@ -32,8 +34,7 @@ customerRouter.post("/customer/lesson/",customerAuth,lessonController.post)
 customerRouter.get("/customer/lesson/list/:chapterId",customerAuth,lessonController.list)
 customerRouter.get("/customer/lesson/:id",customerAuth,lessonController.get)
 
-customerRouter.get("/customer/list/:page",customerController.list)
-customerRouter.put("/customer/active/:id",customerController.put)
+
 
 customerRouter.post("/customer/certificate/",customerAuth,certificateController.post)
 customerRouter.get("/customer/certificate/",customerAuth,certificateController.get)

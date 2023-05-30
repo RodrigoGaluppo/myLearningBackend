@@ -82,7 +82,6 @@ async function list(req:ICustomerAuthenticated, res:Response )
     
 }
 
-
 async function post(req:ICustomerAuthenticated, res:Response )
 {
     try{    
@@ -155,9 +154,11 @@ async function post(req:ICustomerAuthenticated, res:Response )
                 customercourseId,
                 url
             })
+
     
             return res.json(apiRes.data)
-            
+
+        
         })
         .catch((err)=>{
             console.log(err);

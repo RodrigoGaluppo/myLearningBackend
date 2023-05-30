@@ -12,8 +12,12 @@ import employeeAuth from "../../middlewares/employeeAuth";
 import uploadImg from "../../middlewares/uploadImg";
 import uploadVideo from "../../middlewares/uploadVideo";
 import isEmployeeAdmin from "../../middlewares/isEmployeeAdmin";
+import dataController from "./controllers/dataController";
 
 const employeeRouter = Router();
+
+
+employeeRouter.get("/employee/panel",dataController.get)
 
 employeeRouter.get("/employee/subject/list/",employeeAuth,subjectController.list)
 employeeRouter.get("/employee/subject/:id",employeeAuth,subjectController.get)
