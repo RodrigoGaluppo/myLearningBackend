@@ -1,20 +1,21 @@
 import { Request,Response } from "express";
+import IEmployyeAuthenticated from "../../../global/IEmployeeAuthenticated";
 
 import api from "../../../global/api"
 
-async function get(req:Request, res:Response )
+async function get(req:IEmployyeAuthenticated, res:Response )
 {
     try{    
         
       
-        
         const apiRes = await api.get(`Data`)
 
-        console.log(apiRes.data);
-        
-
-        return res.json(apiRes.data)
-
+        if(req.employee?.employeeRole.toString().toLowerCase() == "admin")
+            return res.json(apiRes.data)
+        else
+            return res.json({
+                ...apiRes.data
+            })
     }
     catch(e:any)
     {
