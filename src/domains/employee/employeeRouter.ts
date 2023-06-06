@@ -17,7 +17,7 @@ import dataController from "./controllers/dataController";
 const employeeRouter = Router();
 
 
-employeeRouter.get("/employee/panel",dataController.get)
+employeeRouter.get("/employee/panel",employeeAuth,dataController.get)
 
 employeeRouter.get("/employee/subject/list/",employeeAuth,subjectController.list)
 employeeRouter.get("/employee/subject/:id",employeeAuth,subjectController.get)
